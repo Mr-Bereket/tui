@@ -1,4 +1,3 @@
-#include <vector>
 #include <ncurses.h>
 
 class Widget
