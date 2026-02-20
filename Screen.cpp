@@ -1,4 +1,7 @@
 #include <vector>
+#include "Widget.cpp"
+
+using namespace std;
 
 class Screen {
 private:
