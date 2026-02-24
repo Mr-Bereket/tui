@@ -1,7 +1,6 @@
 #include <vector>
 #include <ncurses.h>
 #include "Widget.h"
-#include "Label.h"
 
 using namespace std;
 
@@ -9,6 +8,7 @@ class Screen {
 private:
     vector<Widget*> widgets;
 public:
+    Widget* activeInput = nullptr;
     Screen(){
       initscr();
       noecho();
@@ -19,7 +19,7 @@ public:
       endwin();
     }
 
-    void addWidget(Widget* w) { widgets.push_back(w); }
+    void add(Widget* w) { widgets.push_back(w); }
 
     void update() {
         erase(); // clear ncurses buffer
@@ -28,9 +28,20 @@ public:
     }
 
     void run() {
+        update();
         int ch;
-        while((ch = getch()) != 'q') { // 'q' to quit
-            for (auto w : widgets) w->handleInput(ch);
+        while( !( (ch = getch()) == 'q' && !activeInput) ) { // 'q' to quit
+            if(activeInput){
+                if(ch == 27){
+                    activeInput->active=false;
+                    this->activeInput = nullptr;
+                }else{
+                    activeInput->handleInput(ch);
+                }
+            }
+            else {
+                for (auto w : widgets) w->handleInput(ch);
+            }
             update();
         }
     }
