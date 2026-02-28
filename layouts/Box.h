@@ -1,14 +1,12 @@
 #include <vector>
+#include "Layout.h"
 
 using namespace std;
 
-class Box : public Widget
+class Box : public Layout
 {
 public:
-	vector<Widget*> children;
-
-
-	Box(int x,int y, int w , int h) : Widget(x,y,w,h){}
+	Box(int x,int y, int w , int h) : Layout(x,y,w,h){}
 
 	void draw() override {
 		if (!visible) return;
@@ -35,15 +33,8 @@ public:
         	child->draw();
         }
 	}
-	void add(Widget* w){
-		children.push_back(w);
-		w->parent = this;
-	}
-
-    void handleInput(int ch) override {
-        if(onClick) onClick();
-        for(auto* child:children){
-            child->handleInput(ch);
-        }
+    void add(Layout* child){
+        this->children.push_back(child);
+        child->parent = this;
     }
 };

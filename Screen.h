@@ -1,29 +1,26 @@
 #include <vector>
 #include <ncurses.h>
-#include "Widget.h"
+#include "widgets/Widget.h"
+#include "layouts/Layout.h"
 
 using namespace std;
 
-class Screen {
-private:
-    vector<Widget*> widgets;
+class Screen : public Layout {
 public:
-    Widget* activeInput = nullptr;
-    Screen(){
+    Layout* activeInput = nullptr;
+    Screen(int x=0,int y=0, int w=COLS,int h=LINES):Layout(x,y,w,h){
       initscr();
       noecho();
       curs_set(0);
       keypad(stdscr, TRUE);
     }
-    ~Screen(){
-      endwin();
+    void add(Layout* child){
+        children.push_back(child);
+        child->parent = this;
     }
-
-    void add(Widget* w) { widgets.push_back(w); }
-
     void update() {
         erase(); // clear ncurses buffer
-        for (auto w : widgets) w->draw();
+        draw();
         refresh(); // push to physical terminal
     }
 
@@ -32,17 +29,16 @@ public:
         int ch;
         while( !( (ch = getch()) == 'q' && !activeInput) ) { // 'q' to quit
             if(activeInput){
-                if(ch == 27){
-                    activeInput->active=false;
-                    this->activeInput = nullptr;
-                }else{
                     activeInput->handleInput(ch);
                 }
             }
             else {
-                for (auto w : widgets) w->handleInput(ch);
+                for (auto child: children) child->handleInput(ch);
             }
             update();
         }
+    }
+    ~Screen(){
+      endwin();
     }
 };

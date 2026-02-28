@@ -24,6 +24,8 @@ public:
 		//delete or backspace
 		else if(ch == KEY_BACKSPACE || ch == 127 || ch == 8){
 			if(!value.empty()) value.pop_back();
-		}
+		}else if(ch == 27){ //esc
+			active = false;
+			parent->active(false);
 	}
 };
